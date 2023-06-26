@@ -112,6 +112,7 @@ arch_to_kernel() {
 		ppc64le) echo "powerpc" ;;
 		s390x) echo "s390" ;;
 		x86_64) echo "$arch" ;;
+		loongarch64) echo "loongarch" ;;
 		*) die "unsupported architecture: $arch" ;;
 	esac
 }
@@ -315,7 +316,6 @@ get_default_kernel_config() {
 		[ "${hypervisor}" == "firecracker" ] && hypervisor="kvm"
 		config="${default_kernel_config_dir}/${kernel_arch}_kata_${hypervisor}_${major_kernel}.x"
 	fi
-
 	[ -f "${config}" ] || die "failed to find default config ${config}"
 	echo "${config}"
 }
@@ -373,13 +373,16 @@ setup_kernel() {
 	(
 	cd "${kernel_path}" || exit 1
 
-	# Apply version specific patches
-	${packaging_scripts_dir}/apply_patches.sh "${patches_dir_for_version}"
+	# Loongarch64 builds directly from source code
+	if [ "$(uname -m)" != "loongarch64" ]; then
+		# Apply version specific patches
+		${packaging_scripts_dir}/apply_patches.sh "${patches_dir_for_version}"
 
-	# Apply version specific patches for build_type build
-	if [ "${build_type}" != "" ] ;then
-		info "Apply build_type patches from ${build_type_patches_dir}"
-		${packaging_scripts_dir}/apply_patches.sh "${build_type_patches_dir}"
+		# Apply version specific patches for build_type build
+		if [ "${build_type}" != "" ] ;then
+			info "Apply build_type patches from ${build_type_patches_dir}"
+			${packaging_scripts_dir}/apply_patches.sh "${build_type_patches_dir}"
+		fi
 	fi
 
 	[ -n "${hypervisor_target}" ] || hypervisor_target="kvm"
