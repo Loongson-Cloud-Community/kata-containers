@@ -16,6 +16,9 @@ ifeq ($(ARCH),)
         override ARCH = $(shell uname -m)
     endif
 endif
+ifeq ($(ARCH),loongarch64)
+    override ARCH = loong64
+endif
 ifeq ($(ARCH),x86_64)
     override ARCH = amd64
 endif

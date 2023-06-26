@@ -37,7 +37,7 @@ const (
 	MockHybridVSockScheme = "mock"
 )
 
-var defaultDialTimeout = 30 * time.Second
+var defaultDialTimeout = 300 * time.Second
 
 var hybridVSockPort uint32
 

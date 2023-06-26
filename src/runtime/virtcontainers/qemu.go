@@ -2217,7 +2217,7 @@ func (q *qemu) ResizeMemory(ctx context.Context, reqMemMB uint32, memoryBlockSiz
 func genericAppendBridges(devices []govmmQemu.Device, bridges []types.Bridge, machineType string) []govmmQemu.Device {
 	bus := defaultPCBridgeBus
 	switch machineType {
-	case QemuQ35, QemuVirt:
+	case QemuQ35, QemuVirt, QemuLoongson7a:
 		bus = defaultBridgeBus
 	}
 
@@ -2278,6 +2278,8 @@ func genericBridges(number uint32, machineType string) []types.Bridge {
 		bt = types.PCI
 	case QemuCCWVirtio:
 		bt = types.CCW
+	case QemuLoongson7a:
+		bt = types.PCI
 	default:
 		return nil
 	}

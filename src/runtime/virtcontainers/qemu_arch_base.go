@@ -203,6 +203,9 @@ const (
 	// QemuCCWVirtio is a QEMU virt machine type for for s390x
 	QemuCCWVirtio = "s390-ccw-virtio"
 
+	// QemuLoongson7a is a QEMU virt machine type for for loongarch64
+	QemuLoongson7a = "loongson7a"
+
 	qmpCapMigrationIgnoreShared = "x-ignore-shared"
 
 	qemuNvdimmOption = "nvdimm=on"

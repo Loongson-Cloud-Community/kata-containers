@@ -133,7 +133,7 @@ const (
 
 func isDimmSupported(config *Config) bool {
 	switch runtime.GOARCH {
-	case "amd64", "386", "ppc64le", "arm64":
+	case "amd64", "386", "ppc64le", "arm64", "loong64":
 		if config != nil && config.Machine.Type == MachineTypeMicrovm {
 			// microvm does not support NUMA
 			return false
@@ -2642,6 +2642,10 @@ func (config *Config) appendName() {
 	if config.Name != "" {
 		config.qemuParams = append(config.qemuParams, "-name")
 		config.qemuParams = append(config.qemuParams, config.Name)
+		config.qemuParams = append(config.qemuParams, "-chardev")
+		config.qemuParams = append(config.qemuParams, "file,id=char0,path=/tmp/serial.log")
+		config.qemuParams = append(config.qemuParams, "-serial")
+		config.qemuParams = append(config.qemuParams, "chardev:char0")
 	}
 }
 
