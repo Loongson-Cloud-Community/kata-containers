@@ -13,7 +13,8 @@ pub const SYSFS_DIR: &str = "/sys";
     target_arch = "powerpc64",
     target_arch = "s390x",
     target_arch = "x86_64",
-    target_arch = "x86"
+    target_arch = "x86",
+    target_arch = "loongarch64"
 ))]
 pub fn create_pci_root_bus_path() -> String {
     String::from("/devices/pci0000:00")

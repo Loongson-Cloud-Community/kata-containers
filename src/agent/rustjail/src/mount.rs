@@ -34,6 +34,7 @@ use crate::log_child;
 // struct is populated from the content in the /proc/<pid>/mountinfo file.
 #[derive(std::fmt::Debug)]
 pub struct Info {
+    #[allow(dead_code)]
     mount_point: String,
     optional: String,
     fstype: String,
