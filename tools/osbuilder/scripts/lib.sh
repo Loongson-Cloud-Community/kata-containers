@@ -100,7 +100,7 @@ build_rootfs()
 	#local CONFIG_DIR=${CONFIG_DIR}
 
 	check_root
-	if [ ! -f "${DNF_CONF}" ] && [ -z "${DISTRO_REPO}" ] ; then
+	if [ ! -f "${DNF_CONF}" ] && [ -z "${DISTRO_REPO}" ] && [ "$(uname -m)" != "loongarch64" ]; then
 		DNF_CONF="./kata-${OS_NAME}-dnf.conf"
 		generate_dnf_config
 	fi
@@ -118,12 +118,15 @@ build_rootfs()
 	DNF="${PKG_MANAGER} -y --installroot=${ROOTFS_DIR} --noplugins"
 	if [ -n "${DNF_CONF}" ] ; then
 		DNF="${DNF} --config=${DNF_CONF}"
+	elif [ "$(uname -m)" == "loongarch64" ] ; then
+		DNF="${DNF} --releasever=8.4"
+		OS_VERSION=8.4
 	else
 		DNF="${DNF} --releasever=${OS_VERSION}"
 	fi
 
 	info "install packages for rootfs"
-	$DNF install ${EXTRA_PKGS} ${PACKAGES}
+	$DNF install ${EXTRA_PKGS} ${PACKAGES} gcc kmod
 
 	rm -rf ${ROOTFS_DIR}/usr/share/{bash-completion,cracklib,doc,info,locale,man,misc,pixmaps,terminfo,zoneinfo,zsh}
 }
@@ -217,6 +220,9 @@ generate_dockerfile()
 		"s390x")
 			libc=gnu
 			;;
+		"loongarch64")
+			libc=gnu
+			;;
 
 		*)
 			;;
@@ -295,6 +301,10 @@ RUN ln -sf /usr/bin/g++ /bin/musl-g++
 			-e "s|@OS_VERSION@|${OS_VERSION:-}|g" \
 			-e "s|@INSTALL_MUSL@||g" \
 			-e "s|@INSTALL_RUST@|${install_rust//$'\n'/\\n}|g" \
+			-e "s|@SET_PROXY@|${set_proxy:-}|g" \
+			"${dockerfile_template}" > Dockerfile
+	elif [ "${architecture}" == "loongarch64" ]; then
+		sed \
 			-e "s|@SET_PROXY@|${set_proxy:-}|g" \
 			"${dockerfile_template}" > Dockerfile
 	else

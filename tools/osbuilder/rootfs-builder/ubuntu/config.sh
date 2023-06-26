@@ -22,6 +22,7 @@ case $(uname -m) in
 	ppc64le) ARCHITECTURE="ppc64el";;
 	aarch64) ARCHITECTURE="arm64";;
 	s390x)	ARCHITECTURE="s390x";;
+	loongarch64) ARCHITECTURE="loongarch64";;
 	(*) die "$(uname -m) not supported "
 esac
 

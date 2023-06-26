@@ -1,0 +1,50 @@
+#
+# Copyright (c) 2018 Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ARG IMAGE_REGISTRY=cr.loongnix.cn
+FROM ${IMAGE_REGISTRY}/loongson/loongnix-server:8.4.0
+
+#@SET_PROXY@
+
+RUN yum -y update && yum install -y --allowerasing \
+    autoconf \
+    automake \
+    binutils \
+    chrony \
+    coreutils \
+    curl \
+    gcc \
+    gcc-c++ \
+    git \
+    glibc-common \
+    glibc-devel \
+    glibc-headers \
+    glibc-static \
+    glibc-utils \
+    libseccomp \
+    libseccomp-devel \
+    libstdc++-devel \
+    libstdc++-static \
+    m4 \
+    make \
+    sed \
+    tar \
+    vim \
+    which \
+    wget \
+    zip 
+
+RUN wget https://github.com/Loongson-Cloud-Community/kata-containers/releases/download/2.4.0/1.64.0-loongarch64-unknown-linux-gnu.tar.gz && tar -xf 1.64.0-loongarch64-unknown-linux-gnu.tar.gz -C /usr/local/lib/
+COPY protoc-3.12.2.zip /usr/local/ 
+ENV PATH=$PATH:/usr/local/lib/1.64.0-loongarch64-unknown-linux-gnu/bin
+
+RUN unzip /usr/local/protoc-3.12.2.zip; \
+    protoc --version; \
+    rm -rf /usr/local/protoc-3.12.2.zip; \
+    rustc -vV; \
+    cargo -V
+    
+# This will install the proper packages to build Kata components
+

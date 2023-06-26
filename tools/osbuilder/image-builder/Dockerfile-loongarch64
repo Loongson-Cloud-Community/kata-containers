@@ -1,0 +1,10 @@
+#
+# Copyright (c) 2018 Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+ARG IMAGE_REGISTRY=cr.loongnix.cn/loongson
+FROM ${IMAGE_REGISTRY}/loongnix-server:8.4.0
+
+RUN [ -n "$http_proxy" ] && sed -i '$ a proxy='$http_proxy /etc/dnf/dnf.conf ; true
+
+RUN dnf install -y qemu-img parted gdisk e2fsprogs gcc xfsprogs findutils

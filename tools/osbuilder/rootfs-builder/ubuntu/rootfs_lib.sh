@@ -64,11 +64,14 @@ build_rootfs() {
 	# This is done to maintain consistency
 	PACKAGES=$(echo $PACKAGES | sed  -e 's/ /,/g' )
 
-	${PKG_MANAGER} --variant=minbase \
-		--arch=${ARCHITECTURE}\
-		--include="$PACKAGES" \
-		${OS_NAME} \
-		${ROOTFS_DIR}
+	#${PKG_MANAGER} --variant=minbase \
+	#	--arch=${ARCHITECTURE}\
+	#	--include="$PACKAGES" \
+	#	--components=main,contrib,non-free \
+	#	${OS_NAME} \
+	#	${ROOTFS_DIR} \
+	#	http://pkg.loongnix.cn/loongnix
+	debootstrap --variant=minbase --arch=loongarch64 --include=systemd,coreutils,init,kmod,pciutils,ncat,gcc --components=main,contrib,non-free DaoXiangHu-stable /rootfs http://pkg.loongnix.cn/loongnix
 
 	[ -n "${EXTRA_PKGS}" ] && chroot $ROOTFS_DIR apt-get install -y ${EXTRA_PKGS}
 

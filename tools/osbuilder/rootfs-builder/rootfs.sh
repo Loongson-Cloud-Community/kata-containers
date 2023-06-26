@@ -3,7 +3,8 @@
 # Copyright (c) 2018 Intel Corporation
 #
 # SPDX-License-Identifier: Apache-2.0
-
+export PS4='+${BASH_SOURCE}:${LINENO}: '
+set -x
 set -o errexit
 set -o pipefail
 set -o errtrace
@@ -540,7 +541,7 @@ EOT
 	AGENT_DEST="${AGENT_DIR}/${AGENT_BIN}"
 
 	if [ -z "${AGENT_SOURCE_BIN}" ] ; then
-		if [ "$ARCH" == "ppc64le" ] || [ "$ARCH" == "s390x" ]; then
+		if [ "$ARCH" == "ppc64le" ] || [ "$ARCH" == "s390x" ] || [ "$ARCH" == "loongarch64" ]; then
 			LIBC=gnu
 			echo "WARNING: Forcing LIBC=gnu because $ARCH has no musl Rust target"
 		fi
@@ -552,9 +553,9 @@ EOT
 				detect_rust_version || \
 					die "Could not detect the required rust version for AGENT_VERSION='${AGENT_VERSION:-main}'."
 			fi
-			bash ${script_dir}/../../../ci/install_rust.sh ${RUST_VERSION}
+			#bash ${script_dir}/../../../ci/install_rust.sh ${RUST_VERSION}
 		fi
-		test -r "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
+		#test -r "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
 		[ "$ARCH" == "aarch64" ] && OLD_PATH=$PATH && export PATH=$PATH:/usr/local/musl/bin
 
 		agent_dir="${script_dir}/../../../src/agent/"

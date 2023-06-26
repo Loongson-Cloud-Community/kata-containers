@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 OS_NAME=centos
-OS_VERSION=${OS_VERSION:-stream9}
+OS_VERSION=${OS_VERSION:-8}
 PACKAGES=chrony
 [ "$AGENT_INIT" = no ] && PACKAGES+=" systemd"
 [ "$SECCOMP" = yes ] && PACKAGES+=" libseccomp"

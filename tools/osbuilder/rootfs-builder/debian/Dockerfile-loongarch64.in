@@ -1,0 +1,48 @@
+#
+# Copyright (c) 2018 SUSE
+#
+# SPDX-License-Identifier: Apache-2.0
+
+ARG IMAGE_REGISTRY=cr.loongnix.cn
+# NOTE: OS_VERSION is set according to config.sh
+FROM ${IMAGE_REGISTRY}/library/debian:buster
+
+# RUN commands
+RUN apt-get update && apt-get --no-install-recommends install -y \
+    apt-utils \
+    autoconf \
+    automake \
+    binutils \
+    build-essential \
+    ca-certificates \
+    chrony \
+    coreutils \
+    curl \
+    debianutils \
+    debootstrap \
+    g++ \
+    gcc \
+    git \
+    libc-dev \
+    libstdc++-8-dev \
+    m4 \
+    make \
+    sed \
+    systemd \
+    tar \
+    vim \
+    wget \
+    unzip
+
+# This will install the proper packages to build Kata components
+RUN wget https://github.com/Loongson-Cloud-Community/kata-containers/releases/download/2.4.0/1.64.0-loongarch64-unknown-linux-gnu.tar.gz && tar -xf 1.64.0-loongarch64-unknown-linux-gnu.tar.gz -C /usr/local/lib/
+COPY protoc-3.12.2.zip /usr/local/
+ENV PATH=$PATH:/usr/local/lib/1.64.0-loongarch64-unknown-linux-gnu/bin
+
+RUN unzip /usr/local/protoc-3.12.2.zip; \
+    protoc --version; \
+    rm -rf /usr/local/protoc-3.12.2.zip /readme.txt; \
+    rustc -vV; \
+    cargo -V; \
+    ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/DaoXiangHu-stable
+
