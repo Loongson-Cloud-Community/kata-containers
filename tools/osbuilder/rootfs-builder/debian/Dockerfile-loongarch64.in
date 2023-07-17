@@ -35,14 +35,13 @@ RUN apt-get update && apt-get --no-install-recommends install -y \
     unzip
 
 # This will install the proper packages to build Kata components
-RUN wget https://github.com/Loongson-Cloud-Community/kata-containers/releases/download/2.4.0/1.64.0-loongarch64-unknown-linux-gnu.tar.gz && tar -xf 1.64.0-loongarch64-unknown-linux-gnu.tar.gz -C /usr/local/lib/
-COPY protoc-3.12.2.zip /usr/local/
+RUN wget https://github.com/Loongson-Cloud-Community/kata-containers/releases/download/2.4.0/1.64.0-loongarch64-unknown-linux-gnu.tar.gz; \
+    tar -xf 1.64.0-loongarch64-unknown-linux-gnu.tar.gz -C /usr/local/lib/ ; \
+    rm -rf 1.64.0-loongarch64-unknown-linux-gnu.tar.gz
 ENV PATH=$PATH:/usr/local/lib/1.64.0-loongarch64-unknown-linux-gnu/bin
 
-RUN unzip /usr/local/protoc-3.12.2.zip; \
+RUN wget https://github.com/Loongson-Cloud-Community/protobuf/releases/download/v3.12.2/protoc-3.12.2-linux-loongarch_64.zip; \
+    unzip -d /usr/local protoc-3.12.2-linux-loongarch_64.zip; \
     protoc --version; \
-    rm -rf /usr/local/protoc-3.12.2.zip /readme.txt; \
-    rustc -vV; \
-    cargo -V; \
+    rm -rf protoc-3.12.2-linux-loongarch_64.zip; \
     ln -s /usr/share/debootstrap/scripts/sid /usr/share/debootstrap/scripts/DaoXiangHu-stable
-

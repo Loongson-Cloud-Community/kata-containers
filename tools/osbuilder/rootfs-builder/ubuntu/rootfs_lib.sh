@@ -63,15 +63,15 @@ build_rootfs() {
 	# Don't change $PACKAGES in config.sh to include ','
 	# This is done to maintain consistency
 	PACKAGES=$(echo $PACKAGES | sed  -e 's/ /,/g' )
-
-	#${PKG_MANAGER} --variant=minbase \
-	#	--arch=${ARCHITECTURE}\
-	#	--include="$PACKAGES" \
-	#	--components=main,contrib,non-free \
-	#	${OS_NAME} \
-	#	${ROOTFS_DIR} \
-	#	http://pkg.loongnix.cn/loongnix
-	debootstrap --variant=minbase --arch=loongarch64 --include=systemd,coreutils,init,kmod,pciutils,ncat,gcc --components=main,contrib,non-free DaoXiangHu-stable /rootfs http://pkg.loongnix.cn/loongnix
+	if [ "$(uname -m)" == "loongarch64" ]; then
+		debootstrap --variant=minbase --arch=loongarch64 --include=systemd,coreutils,init,kmod,pciutils,ncat,gcc --components=main,contrib,non-free DaoXiangHu-stable /rootfs http://pkg.loongnix.cn/loongnix
+	else
+		${PKG_MANAGER} --variant=minbase \
+			--arch=${ARCHITECTURE}\
+			--include="$PACKAGES" \
+			${OS_NAME} \
+			${ROOTFS_DIR}
+        fi
 
 	[ -n "${EXTRA_PKGS}" ] && chroot $ROOTFS_DIR apt-get install -y ${EXTRA_PKGS}
 

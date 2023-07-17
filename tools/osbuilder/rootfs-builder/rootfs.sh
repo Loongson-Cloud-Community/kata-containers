@@ -553,9 +553,9 @@ EOT
 				detect_rust_version || \
 					die "Could not detect the required rust version for AGENT_VERSION='${AGENT_VERSION:-main}'."
 			fi
-			#bash ${script_dir}/../../../ci/install_rust.sh ${RUST_VERSION}
+			[ "$ARCH" != "loongarch64" ] && bash ${script_dir}/../../../ci/install_rust.sh ${RUST_VERSION}
 		fi
-		#test -r "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
+		[ "$ARCH" != "loongarch64" ] && test -r "${HOME}/.cargo/env" && source "${HOME}/.cargo/env"
 		[ "$ARCH" == "aarch64" ] && OLD_PATH=$PATH && export PATH=$PATH:/usr/local/musl/bin
 
 		agent_dir="${script_dir}/../../../src/agent/"

@@ -8,7 +8,6 @@
 MACHINETYPE := loongson7a
 KERNELPARAMS :=
 MACHINEACCELERATORS :=
-CPUFEATURES := 
+CPUFEATURES :=
 
 QEMUCMD := qemu-system-loongarch64
-
