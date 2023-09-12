@@ -1,0 +1,17 @@
+# Copyright (c) 2021 Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+FROM cr.loongnix.cn/loongson/loongnix-server:8.4.0
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN yum makecache && \
+    yum install -y \
+        curl \
+        gcc \
+        git \
+        make \
+        golang-1.19 \
+        sudo
+
+ENV PATH=/usr/lib/go-1.19/bin:${PATH}

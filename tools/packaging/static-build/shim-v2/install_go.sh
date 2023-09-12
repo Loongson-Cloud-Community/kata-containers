@@ -88,11 +88,16 @@ case "$(uname -m)" in
 	ppc64le) goarch="ppc64le";;
 	x86_64) goarch="amd64";;
 	s390x) goarch="s390x";;
+	loongarch64) goarch="loong64";;
 	*) echo "unsupported architecture: $(uname -m)"; exit 1;;
 esac
 
 info "Download go version ${go_version}"
 kernel_name=$(uname -s)
+if [ "$(uname -m)" = "loongarch64" ]; then
+	kernel_name=linux
+	go_version=1.21.0 #golang officially released the LA architecture binary from 1.21.0
+fi
 curl -OL "https://storage.googleapis.com/golang/go${go_version}.${kernel_name,,}-${goarch}.tar.gz"
 info "Install go"
 mkdir -p "${install_dest}"
