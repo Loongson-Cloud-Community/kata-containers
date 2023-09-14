@@ -34,6 +34,14 @@ prefix="${prefix:-"/opt/kata"}"
 
 CACHE_TIMEOUT=$(date +"%Y-%m-%d")
 
+arch=$(uname -m)
+if [ ${arch} = "loongarch64" ]; then
+	dockerfile="Dockerfile-loongarch64"
+else
+	dockerfile="Dockerfile"
+fi
+
+
 sudo "${container_engine}" build \
 	--build-arg CACHE_TIMEOUT="${CACHE_TIMEOUT}" \
 	--build-arg BUILD_SUFFIX="${build_suffix}" \
@@ -45,13 +53,13 @@ sudo "${container_engine}" build \
 	--build-arg QEMU_TARBALL="${qemu_tar}" \
 	--build-arg PREFIX="${prefix}" \
 	"${packaging_dir}" \
-	-f "${script_dir}/Dockerfile" \
-	-t qemu-static
+	-f "${script_dir}/${dockerfile}" \
+	-t qemu-static:${qemu_version}
 
 sudo "${container_engine}" run \
 	--rm \
 	-i \
-	-v "${PWD}":/share qemu-static \
+	-v "${PWD}":/share qemu-static:${qemu_version} \
 	mv "${qemu_destdir}/${qemu_tar}" /share/
 
 sudo chown ${USER}:$(id -gn ${USER}) "${PWD}/${qemu_tar}"

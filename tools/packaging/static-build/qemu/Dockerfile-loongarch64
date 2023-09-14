@@ -1,0 +1,83 @@
+# Copyright (c) 2019 Intel Corporation
+# Copyright (c) 2020 Ant Group
+#
+# SPDX-License-Identifier: Apache-2.0
+from cr.loongnix.cn/loongson/loongnix-server:8.4.0
+
+
+WORKDIR /root/qemu
+
+# CACHE_TIMEOUT: date to invalid cache, if the date changes the image will be rebuild
+# This is required to keep build dependencies with security fixes.
+ARG CACHE_TIMEOUT
+RUN echo "$CACHE_TIMEOUT"
+RUN sed -i "s/enabled=0/enabled=1/g" /etc/yum.repos.d/Loongnix-PowerTools.repo
+
+RUN yum makecache && \
+    yum install -y \
+	    autoconf \
+	    automake \
+	    bc \
+	    bison \
+	    ca-certificates \
+	    cpio \
+	    flex \
+	    gawk \
+	    audit-libs-devel \
+	    libblkid-devel \
+	    libcap-devel \
+	    libcap-ng-devel \
+	    elfutils-libelf-devel \
+	    libffi-devel \
+	    glib2 \
+	    glib2-devel \
+	    git \
+	    libtool-ltdl-devel \
+	    libmount-devel \
+	    pixman-devel \
+	    pixman \
+	    libselinux-devel \
+	    libtool \
+	    make \
+	    ninja-build \
+	    pkg-config \
+	    libseccomp-devel \
+	    libseccomp \
+	    patch \
+	    spice-server \
+	    spice-server-devel \
+	    python3 \
+	    rsync \
+	    yum-utils \
+	    zlib-devel \
+	    wget \
+	    rpm-build
+
+ARG QEMU_REPO
+# commit/tag/branch
+ARG QEMU_VERSION
+ARG PREFIX
+ARG BUILD_SUFFIX
+ARG QEMU_DESTDIR
+ARG QEMU_TARBALL
+
+COPY scripts/configure-hypervisor.sh /root/configure-hypervisor.sh
+COPY qemu /root/kata_qemu
+COPY scripts/apply_patches.sh /root/apply_patches.sh
+COPY scripts/patch_qemu.sh /root/patch_qemu.sh
+COPY static-build/scripts/qemu-build-post.sh /root/static-build/scripts/qemu-build-post.sh
+COPY static-build/qemu.blacklist /root/static-build/qemu.blacklist
+COPY static-build/qemu/kata-qemu-Loongarch64.sh /root/qemu/kata-qemu-Loongarch64.sh
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN wget https://build.openanolis.cn/kojifiles/output/nightly/anolis-8-20230627.0/compose/AppStream/source/tree/Packages/qemu-kvm-6.2.0-22.0.2.module+an8.7.0+11038+e03956fa.2.src.rpm && \
+    rpm -ivh qemu-kvm-6.2.0-22.0.2.module+an8.7.0+11038+e03956fa.2.src.rpm && \
+    cd ~/rpmbuild/SPECS  && \
+    yum-builddep -y qemu-kvm.spec && \
+    rpmbuild -bp qemu-kvm.spec && \
+    mv /root/qemu/kata-qemu-Loongarch64.sh ~/rpmbuild/BUILD/qemu-6.2.0  && \
+    cd ~/rpmbuild/BUILD/qemu-6.2.0 && \
+    ~/rpmbuild/BUILD/qemu-6.2.0/kata-qemu-Loongarch64.sh && \
+    cd b && make -j"$(nproc)" && make install DESTDIR="${QEMU_DESTDIR}" && \
+    /root/static-build/scripts/qemu-build-post.sh && \
+    rm -rf ~/rpmbuild && rm -rf /root/qemu/qemu-kvm-6.2.0-22.0.2.module+an8.7.0+11038+e03956fa.2.src.rpm \
