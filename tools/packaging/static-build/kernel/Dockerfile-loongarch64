@@ -1,0 +1,27 @@
+# Copyright (c) 2021 Intel Corporation
+#
+# SPDX-License-Identifier: Apache-2.0
+
+FROM cr.loongnix.cn/loongson/loongnix-server:8.4.0
+RUN sed -i "s/enabled=0/enabled=1/g" /etc/yum.repos.d/Loongnix-PowerTools.repo && \
+    yum makecache && \
+    yum install -y \
+    make \
+    wget \
+    rpm-build \
+    yum-utils
+
+ADD loongarch_kata_kvm_4.19.x  /home/loongarch_kata_kvm_4.19.x
+ARG INSTALL_PATH
+# Build kernel source
+RUN wget https://pkg.loongnix.cn/loongnix-server/8.4/BaseOS/Source/SPackages/kernel-4.19.190-7.4.lns8.src.rpm && \
+    rpm -ivh kernel-4.19.190-7.4.lns8.src.rpm && \
+    cd ~/rpmbuild/SPECS && \
+    yum-builddep -y kernel.spec && \
+    rpmbuild -bp kernel.spec && \
+    cp /home/loongarch_kata_kvm_4.19.x ~/rpmbuild/BUILD/kernel-4.19.190-7.4/linux-4.19.190-7.4.lns8.loongarch64/.config && \
+    cd ~/rpmbuild/BUILD/kernel-4.19.190-7.4/linux-4.19.190-7.4.lns8.loongarch64 && make -j32 && \
+    install --mode 0644 -D  vmlinuz ${INSTALL_PATH}/vmlinuz-4.19-7.4 && \
+    ln -s ${INSTALL_PATH}/vmlinuz-4.19-7.4 ${INSTALL_PATH}/vmlinuz.containers && \
+    cp /home/loongarch_kata_kvm_4.19.x ${INSTALL_PATH}/ && \
+    rm -rf ~/rpmbuild && rm -rf kernel-4.19.190-7.4.lns8.src.rpm
